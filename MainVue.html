@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shenzhen Vocational College of Information</title>
+  <link rel="icon" type="image/png" href="pics/RainImage.png">
+  <link rel="stylesheet" href="vueStyle.css">
+</head>
+
+<body>
+
+  <div id="app">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="upper">
+        <div class="logo">
+          <a href="./portal.html"> <img src="pics/default_new_logo_pic.png" alt="logo" /></a>
+          <span class="tooltiptext">Back to portal</span>
+        </div>
+        <div class="menu">
+          <img src="pics/logo1.png" alt="Teaching Management" />
+          <p>Teach Management</p>
+        </div>
+      </div>
+      <div class="bottom">
+        <div class="download">
+          <img src="pics/download.png" alt="Download Icon" />
+        </div>
+        <div class="profile">
+          <img src="pics/profile.jpg" alt="Profile Picture" />
+          <div class="profile-options">
+            <ul>
+              <li>Hello, Rasheed Muhammad Asad</li>
+              <li>Reset Password</li>
+              <li>Quit</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-option">
+        <h1>The class I attended</h1>
+      </div>
+      <p class="archive" @click="navigateToArchive">My Archive</p>
+    </div>
+
+    <!-- Archive Modal -->
+    <div v-if="showArchiveModal" class="archive-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>My Archives <span class="span">(The system automatically archives the history semester teaching
+              classes. Archived classes cannot send teaching activities.) </span></h3>
+          <span class="cancel" @click="closeArchiveModal">Cancel</span>
+        </div>
+        <div class="modal-body">
+          <div class="archive-status">
+            <p @click="setActiveTab('teach')" :style="{ color: activeTab === 'teach' ? 'blue' : 'black' }">
+              Classes I Teach({{archiveClassITeachCount}})
+            </p>
+            <p @click="setActiveTab('courses')" :style="{ color: activeTab === 'courses' ? 'blue' : 'black' }">
+              My Courses ({{ archivedCourseCount }})
+            </p>
+          </div>
+          <div class="archive-content">
+            <div v-if="activeTab === 'teach'" class="tab-content">
+              <div v-for="course in activeCourses" :key="course.title" class="course-item">
+                <h4>{{ course.title }}</h4>
+                <p>{{ course.details }}</p>
+              </div>
+            </div>
+            <div v-if="activeTab === 'courses'" class="tab-content">
+              <div v-for="course in archivedCourses" :key="course.title" class="item-course">
+                <h4>{{ course.title }}</h4>
+                <div class="detail">
+                  <p>{{ course.details }}</p>
+                  <button class="remove" @click="removeFromArchive(course)">Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Archive Prompt Modal -->
+    <div v-if="showPromptModal" class="prompt-modal">
+      <div class="modal-content">
+        <h3>Hint</h3>
+        <p>After archiving, the course will not be visible on the homepage. You can find the archived course in
+          "My Archive".</p>
+
+        <div class="checkbox-container">
+          <input type="checkbox" id="customCheckbox" v-model="confirmCheckbox">
+          <label for="customCheckbox">Don't remind me agian</label>
+        </div>
+
+        <div class="modal-buttons">
+          <button @click="confirmArchive">Confirm</button>
+          <button @click="closePromptModal">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <div class="search-bar">
+        <input type="search" v-model="searchQuery" placeholder="Search Course.." />
+        <div v-if="!filteredCourses.length" id="search-message">
+          No courses match. Please try again.
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="courses">
+          <div class="course-card" v-for="(course, index) in filteredCourses" :key="index">
+            <div class="text" @click="navigateToDetails(course)">
+              <h3>{{ course.title }}</h3>
+              <p>
+                <img src="pics/R.png" alt="" class="home" />
+                {{ course.details }}
+              </p>
+            </div>
+            <div class="parent">
+              <div class="dots">
+                ...
+                <div class="child">
+                  <button class="arch" @click="archiveCourse(course)">Archive</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-router@4"></script>
+
+  <script>
+    const app = Vue.createApp({
+      data() {
+        return {
+          activeTab: 'teach',
+          searchQuery: "",
+          courses: [
+            {
+              title: "Operating System",
+              details:
+                "2024 Fall-22 Software Technology Class 3-9 (Shenzhen Information Technology-Pakistan)",
+            },
+            {
+              title: "Graphic Design",
+              details:
+                "2024 Fall-22 Software Technology Class 3-9 (Shenzhen Information Technology-Pakistan)",
+            },
+            {
+              title: "Project Training 2",
+              details:
+                "2024 Fall-22 Software Technology Class 3-9 (Shenzhen Information Technology-Pakistan)",
+            },
+            {
+              title: "HTML5 Advanced Development",
+              details:
+                "2024 Fall-22 Software Technology Class 3-9 (Shenzhen Information Technology-Pakistan)",
+            },
+            {
+              title: "Machine Learning Application Technology",
+              details:
+                "2024 Fall-22 Software Technology Class 3-9 (Shenzhen Information Technology-Pakistan)",
+            },
+            {
+              title: "Advanced Android Development",
+              details:
+                "2024 Fall-22 Software Technology Class 3-9 (Shenzhen Information Technology-Pakistan)",
+            },
+            {
+              title: "China's ICT Technology and Industry",
+              details:
+                "2024 Fall-22 Software Technology Class 3-9 (Shenzhen Information Technology-Pakistan)",
+            },
+            {
+              title: "Advanced Java Development",
+              details:
+                "2024 Fall-22 Software Technology Class 3-9 (Shenzhen Information Technology-Pakistan)",
+            },
+            {
+              title: "Situation and Policy IV",
+              details:
+                "2024 Fall-22 Software Technology Class 3-9 (Shenzhen Information Technology-Pakistan)",
+            },
+          ],
+          archivedCourses: [],
+          activeCourses: [],
+          showArchiveModal: false,
+          showPromptModal: false,
+          selectedCourse: null,
+          confirmCheckbox: false,
+        };
+      },
+      mounted() {
+        // Automatically archive the last course when the page loads
+        this.autoArchiveLastCourse();
+      },
+      computed: {
+        filteredCourses() {
+          const query = this.searchQuery.toLowerCase();
+          return this.courses.filter((course) =>
+            !this.archivedCourses.includes(course) &&
+            course.title.toLowerCase().includes(query)
+          );
+        },
+        archiveClassITeach() {
+          return this.courses.filter((course) =>
+            course.details.includes("Class I Teach")
+          );
+        },
+        archiveClassITeachCount() {
+          return this.archiveClassITeach.length;
+        },
+        archivedCourseCount() {
+          return this.archivedCourses.length;
+        },
+      },
+      methods: {
+        navigateToDetails(course) {
+          const params = new URLSearchParams({
+            title: course.title,
+            details: course.details
+          }).toString();
+
+          // Navigate to the new page
+          window.location.href = `courseDetails.html?${params}`;
+        },
+        setActiveTab(tab) {
+          this.activeTab = tab;
+        },
+        archiveCourse(course) {
+          const showPrompt = localStorage.getItem("showPrompt") !== "false";
+          if (showPrompt) {
+            this.openPromptModal(course);
+          } else {
+            this.addToArchive(course);
+          }
+        },
+        openPromptModal(course) {
+          this.selectedCourse = course;
+          this.showPromptModal = true;
+        },
+        closePromptModal() {
+          this.showPromptModal = false;
+          this.confirmCheckbox = false;
+        },
+        confirmArchive() {
+          if (this.selectedCourse) {
+            if (this.confirmCheckbox) {
+              localStorage.setItem("showPrompt", "false");
+            }
+            this.addToArchive(this.selectedCourse);
+            this.closePromptModal();
+          }
+        },
+        addToArchive(course) {
+          this.archivedCourses.push(course);
+          this.courses = this.courses.filter(c => c !== course);
+          this.selectedCourse = null;
+        },
+        navigateToArchive() {
+          this.showArchiveModal = true;
+        },
+        closeArchiveModal() {
+          this.showArchiveModal = false;
+        },
+        removeFromArchive(course) {
+          this.archivedCourses = this.archivedCourses.filter(c => c !== course);
+          this.courses.push(course);
+        },
+        autoArchiveLastCourse() {
+          const lastCourse = this.courses[this.courses.length - 1];
+          this.addToArchive(lastCourse);
+        },
+      },
+    });
+
+    app.mount("#app");
+  </script>
+</body>
+
+</html>
