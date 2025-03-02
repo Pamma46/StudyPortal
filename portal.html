@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shenzhen Vocational College of Information</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="pics/RainImage.png">
+    <link rel="stylesheet" href="Portal.css">
+</head>
+
+<body>
+    <div id="app">
+            <nav class="navbar">
+                <div class="logo-container">
+                    <a href="epx.html"><img class="logo" src="pics/Xuetangx.png" alt="Logo"></a>
+                </div>
+                <div class="nav-links">
+                    <p class="nav-link-page">Front page</p>
+                    <a class="nav-link-course" href="MyCourses.html">All courses</a>
+                </div>
+                <form id="searchForm" class="search-form">
+                    <input id="searchInput" class="search-input" type="text" placeholder="Search Courses...">
+                    <button type="submit" class="search-button">
+                        <img src="pics/search blue.svg" alt="Search">
+                    </button>
+                </form>
+                <button class="download-app">
+                    Download the app
+                    <div class="tooltip">
+                        <img src="pics/QR code.png" alt="QR code">
+                    </div>
+                </button>
+                <img class="user-avatar" src="pics/profile.jpg" alt="User">
+                <div class="study-link">
+                    <a href="MainVue.html" class="study-space">Study space</a>
+                </div>
+            </nav>
+
+        <img class="banner" src="pics/school.png" alt="School">
+
+        <div class="content">
+            <div class="announcements">
+                <h1>Announcement</h1>
+                <h1>Notify</h1>
+            </div>
+            <div class="notifications">
+                <p>There is no announcement yet!</p>
+                <p>There is no announcement yet!</p>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <h2 class="footer-heading">Shenzhen Vocational College of Information Technology</h2>
+                <p class="footer-description">Platform services and technical support</p>
+                <div class="footer-grid">
+                    <div class="footer-item">
+                        <div class="icon-wrapper"><img src="pics/phone.svg" alt="Phone"></div>
+                        <div class="icon-detail">
+                            <h3>CALL</h3>
+                            <p>400-689-1199</p>
+                            <p>010-8215-2530</p>
+                        </div>
+                    </div>
+                    <div class="footer-item">
+                        <div class="icon-wrapper"><img src="pics/mail.svg" alt="Mail"></div>
+                        <div class="icon-detail">
+                            <h3>MAIL</h3>
+                            <p>bsupport@xuetangx.com</p>
+                            <p>creditcourse@xuetangx.com</p>
+                        </div>
+                    </div>
+                    <div class="footer-item">
+                        <div class="icon-wrapper"><img src="pics/clock.svg" alt="Clock"></div>
+                        <div class="icon-detail">
+                            <h3>WORK TIME</h3>
+                            <p>Working Day</p>
+                            <p>9:00-18:00</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="footer-legal">
+                    Copyright 2013-2024 Beijing ICP No. 14019655 |
+                    <img src="pics/bottom public.png" alt="">
+                    Beijing Public Security Network No. 11010802033052 |
+                    Beijing Muhua Information Technology Co., Ltd.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/vue@3"></script>
+
+    <Script>
+
+        const app = Vue.createApp({
+            data() {
+                return {};
+            },
+            methods: {},
+        });
+        app.mount("#app");
+
+    </Script>
+
+</body>
+
+</html>
