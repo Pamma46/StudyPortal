@@ -1,0 +1,254 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 1290px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    overflow-x: auto;
+}
+
+/* Navbar */
+.navbar {
+    position: sticky;
+    top: 0;
+    width: 104%;
+    /* Full width */
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;
+    padding: 10px 60px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding-right: 80px;
+}
+.logo {
+    padding-right: 16rem;
+}
+
+.navbar .logo-container img {
+    height: 50px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-link-page,
+.nav-link-course {
+    font-size: 16px;
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.nav-link-page:hover{
+    color: rgb(115, 115, 235);
+}
+
+.nav-link-course:hover {
+    color: rgb(115, 115, 235);
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.search-input {
+    border: 1px solid gray;
+    padding: 10px 2px;
+    border-radius: 4px;
+    width: 200px;
+    background-color: #f5f5f5;
+    
+}
+
+.search-button{
+    position: absolute;
+    right: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    padding: 5px;
+    background-color: #f5f5f5;
+    cursor: pointer;
+}
+
+.search-input:focus {
+    outline: none;
+}
+
+.search-button img {
+    height: 20px;
+}
+
+.download-app {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    background-color: white;
+    font-size: 16px;
+    color: #333;
+}
+
+.download-app:hover {
+    color: rgb(114, 114, 224)
+}
+
+.download-app .tooltip {
+    display: none;
+    position: absolute;
+    top: 40px;
+    left: 2;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.download-app:hover .tooltip {
+    display: block;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    /* margin-left: 10px; */
+    cursor: pointer;
+}
+
+.study-space {
+    text-decoration: none;
+    border-radius: 3px;
+    border: 1px solid rgb(121, 121, 236);
+    padding: 5px;
+    color: rgb(121, 121, 236);
+}
+
+.study-space:hover {
+    background-color: rgb(121, 121, 236);
+    color: white;
+}
+
+/* Fixed Banner */
+.banner {
+    width: 1300px;
+    /* Fixed width */
+    height: auto;
+    z-index: 1;
+    padding-left:60px;
+    padding-right: 40px;
+}
+
+.content {
+    text-align: center;
+    width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    z-index: 2;
+}
+
+.announcements {
+    display: flex;
+    gap: 35rem;
+    margin: 50px 0;
+    width: 1200px;
+    font-size: 10px;
+    color: #817a7a;
+}
+
+.notifications {
+    display: flex;
+    justify-content: space-between;
+    color: #584e4e;
+    width: 1200px;
+    margin: 30px 20px;
+    padding-left: 8rem;
+    padding-right: 10rem;
+}
+
+/* Footer */
+.footer {
+    background-color: #222;
+    color: white;
+    padding: 50px 70px;
+    width: 104%;
+    margin: 0 auto;
+}
+
+.footer h2 {
+    margin-bottom: 10px;
+    font-size: 35px;
+}
+
+.footer-description {
+    padding-top: 30px;
+    padding-left: 10px;
+}
+
+.footer .footer-description:After {
+    content: "";
+    display: block;
+    width: 3px;
+    height: 13px;
+    background-color: rgb(22, 22, 245);
+    position: relative;
+    top: -19px;
+    left: -0.5%;
+    z-index: 10;
+    
+}
+
+.footer-grid {
+    display: flex;
+    gap: 85px;
+    width: 1200px;
+    padding-top: 20px;
+    padding-bottom: 30px;
+}
+
+.footer-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+}
+
+.icon-wrapper {
+    box-sizing: border-box;
+    border: 1px solid gray;
+    border-radius: 50px;
+    height: 50px;
+    width: 50px;
+    padding: 12px;
+}
+
+.icon-detail {
+    font-size: 12px;
+}
+
+.footer-legal {
+    border-top: 1px solid gray;
+    padding-top: 20px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.footer-legal img {
+    position: relative;
+    height: 15px;
+    top: 3px;
+}
