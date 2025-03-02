@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shenzhen Vocational College of Information</title>
+    <link rel="icon" type="image/png" href="pics/RainImage.png">
+    <link rel="stylesheet" href="MyCourses.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+</head>
+
+<body>
+    <!-- Wrapper for entire page -->
+    <div id="app">
+        <!-- Header Section -->
+        <header>
+            <div class="main-logo">
+                <a href="index.html"> <img src="pics/school.png" alt="Logo"> </a>
+            </div>
+            <nav class="nav-links">
+                <a href="portal.html" class="active">Home</a>
+                <a href="all-courses.html" class="all-courses">All Courses</a>
+                <div class="search-bar">
+                    <input type="text" v-model="searchQuery" placeholder="Search Courses" @input="searchCourses">
+                    <img src="pics/search blue.svg" alt="search">
+                </div>
+                <div class="for-the-app">
+                    <a href="#" class="for-app">Download APP</a>
+                    <div class="qr-code">
+                        <img src="pics/QR code.png" alt="APP">
+                        <p>Download the Student App</p>
+                    </div>
+                </div>
+                <!-- Fixed Button -->
+                <a href="#" class="move-to-workspace" @click.prevent="openPopup">Learning Space</a>
+            </nav>
+        </header>
+        
+        <!-- Main Content -->
+        <div class="course-selection">
+            <div class="heading">
+                <h3>Course Filter</h3>
+            </div>
+            <div class="course-filters">
+                <!-- Semester Section -->
+                <div class="filter-group">
+                    <div class="filter-heading">
+                        <p>Course Semester:</p>
+                    </div>
+                    <div class="filter-options">
+                        <span>All</span>
+                        <span>2024-2025 Year, Second Semester</span>
+                        <span>2024-2025 Year, First Semester</span>
+                        <span>2023-2024 Year, Second Semester</span>
+                        <span>2023-2024 Year, First Semester</span>
+                        <span>2022-2023 Year, Second Semester</span>
+                        <span>2022-2023 Year, First Semester</span>
+                        <span>2021-2022 Year, Second Semester</span>
+                        <span>2021-2022 Year, First Semester</span>
+                        <span>2020-2021 Year, Second Semester</span>
+                        <span>2020-2021 Year, First Semester</span>
+                        <span>2019-2020 Year, Second Semester</span>
+                    </div>
+                </div>
+                <!-- Course Category Section -->
+                <div class="filter-group">
+                    <div class="filter-heading">
+                        <p>Course Category:</p>
+                    </div>
+                    <div class="filter-options">
+                        <span>All</span>
+                    </div>
+                </div>
+        
+                <!-- Course Status Section -->
+                <div class="filter-group">
+                    <div class="filter-heading">
+                        <p>Course Status:</p>
+                    </div>
+                    <div class="filter-options">
+                        <span>All</span>
+                        <span>Upcoming</span>
+                        <span>Current</span>
+                        <span>Archived</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="course-list">
+            <div class="course-list-heading">
+                <p>Number of Courses: {{ courses.length }}</p>
+            </div>
+            <div v-for="course in paginatedCourses" :key="course.id" class="course-card">
+                <img :src="course.image" alt="course.title">
+                <div class="course-info">
+                    <h3>{{ course.title }}</h3>
+                    <div class="course-details">
+                        <a href="#" class="course-link">
+                            <img :src="course.teacherImage" alt="Teacher" class="teacher-image">
+                            <span>{{ course.teacherName }}</span>
+                            <img src="./Courses-images/eye.svg" alt="Views" class="icon">
+                            <span>View Count: {{ course.views }}</span>
+                            <img src="./Courses-images/person.svg" alt="Enrolled" class="icon">
+                            <span>Enrolled Students: {{ course.enrolled }}</span>
+                            <img src="./Courses-images/clock.svg" alt="Hours" class="icon">
+                            <span>Course Hours: {{ course.hours }}</span>
+                            <img src="./Courses-images/graduate.svg" alt="Graduated" class="icon">
+                            <span>Credits: {{ course.credits }}</span>
+                        </a>
+                    </div>
+                    <div class="course-description">
+                        <span>Course Description:</span>
+                        <span>{{ course.description }}</span>
+                    </div>
+                    <div class="hover-bar"><img src="./Courses-images/right-arrow.svg" alt="right-arrow"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination">
+            <!-- Left Arrow Button -->
+            <a @click="goToPreviousPage" :class="{ disabled: currentPage === 1 }">&#8592;</a>
+        
+            <!-- Page Numbers -->
+            <a v-for="page in totalPages" :key="page" @click="goToPage(page)" :class="{ active: currentPage === page }">
+                {{ page }}
+            </a>
+        
+            <!-- Right Arrow Button -->
+            <a @click="goToNextPage" :class="{ disabled: currentPage === totalPages }">&#8594;</a>
+        </div>
+        
+        <!-- Popup Modal -->
+        <div v-bind:class="['popup-overlay', popupClass]" @click="closePopup">
+            <div class="popup" @click.stop>
+                <div class="popup-header">
+                    <button class="close-button" @click="closePopup">×</button>
+                </div>
+                <div class="popup-content">
+                    <div class="popup-left">
+                        <img src="images/popup-image.png" alt="course image">
+                    </div>
+                    <div class="popup-right">
+                        <h3>Course Details</h3>
+                        <div class="qr-code-container">
+                            <img src="images/qrCode.png" alt="QR code">
+                        </div>
+                        <p class="qr-instructions">Scan to download the Student App and start learning!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <div class="footer-container">
+                <h3>Shenzhen Information Vocational Technology College</h3>
+                <p class="subtext">Platform Services and Technical Support</p>
+                <div class="contact-info">
+                    <div class="info-item">
+                        <div class="icon-circle">
+                            <img src="pics/phone.svg" alt="Phone Icon" />
+                        </div>
+                        <div class="info-text">
+                            <p class="title">CALL</p>
+                            <p>400-689-1199</p>
+                            <p>010-8215-2530</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="icon-circle">
+                            <img src="pics/mail.svg" alt="Mail Icon" />
+                        </div>
+                        <div class="info-text">
+                            <p class="title">MAIL</p>
+                            <p>bsupport@xuetangx.com</p>
+                            <p>creditcourse@xuetangx.com</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="icon-circle">
+                            <img src="pics/clock.svg" alt="Clock Icon" />
+                        </div>
+                        <div class="info-text">
+                            <p class="title">WORK TIME</p>
+                            <p>Weekdays</p>
+                            <p>9:00-18:00</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="border"></div>
+                <div class="footer-bottom">
+                    <p>Copyright 2013-2024 京ICP备14019655号 | &nbsp;
+                        <img src="pics/bottom public.png" alt="">
+                        &nbsp;Beijing Public Security Bureau Network Security Record No. 11010802033052| Beijing Muhua Information Technology Co., Ltd.
+                    </p>
+                </div>
+            </div>
+        </footer>        
+    </div>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                currentPage: 1,
+                coursesPerPage: 10,
+                viewMode: 'list',
+                popupClass: '',
+                searchQuery: '',
+                courses: [
+
+                    {
+                        id: 1,
+                        title: 'Practical Chinese',
+                        description: 'This course is a mandatory public course, a core course in humanistic quality education. It is a compulsory public course prescribed by the Ministry of Education for college students (including vocational and technical college students), and it is also a mandatory public course for three-year students of various colleges. Through this course, students can comprehensively improve their basic humanistic qualities and train their basic skills such as understanding, expression, and writing abilities.',
+                        hours: 28,
+                        credits: 3,
+                        image: './Courses-images/course1.jpeg',
+                        teacherImage: './Courses-images/teacher1.jpeg',
+                        teacherName: 'Cai Jing',
+                        views: 3267,
+                        enrolled: 7723,
+                        graduated: 2
+                    },
+                    {
+                        id: 2,
+                        title: 'Military Theory',
+                        description: 'This course is prepared based on the "Teaching Outline for Military Courses in Regular Higher Education Institutions" issued by the Ministry of Education and the National Defense Mobilization Department of the Central Military Commission in 2019. The topics cover the core content of military theory teaching and are taught by renowned military theory experts.',
+                        hours: 50,
+                        credits: 4,
+                        image: './Courses-images/course2.jpg',
+                        teacherImage: './Courses-images/teacher2.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 1256,
+                        enrolled: 5454,
+                        graduated: 120
+                    },
+                    {
+                        id: 3,
+                        title: 'Introduction to Artificial Intelligence',
+                        description: 'This course is prepared based on the "Teaching Outline for Military Courses in Regular Higher Education Institutions" issued by the Ministry of Education and the National Defense Mobilization Department of the Central Military Commission in 2019. The topics cover the core content of military theory teaching and are taught by renowned military theory experts.',
+                        hours: 24,
+                        credits: 8,
+                        image: './Courses-images/course3.jpeg',
+                        teacherImage: './Courses-images/teacher3.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 7238,
+                        enrolled: 80,
+                        graduated: 21
+                    },
+                    {
+                        id: 4,
+                        title: 'Introduction to Basic Principles of Marxism',
+                        description: 'This course is a mandatory public foundation course prescribed by the Ministry of Education in China. The content includes three components: Marxist philosophy, political economy, and scientific socialism. The course aims to educate young students on the fundamental principles and theories of Marxism, helping them establish a correct worldview and outlook on life, and strengthen their belief in socialism and communism.',
+                        hours: 68,
+                        credits: 9,
+                        image: './Courses-images/course4.jpeg',
+                        teacherImage: './Courses-images/teacher4.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 3123,
+                        enrolled: 2133,
+                        graduated: 52
+                    },
+                    {
+                        id: 5,
+                        title: 'Military Theory',
+                        description: 'This course is prepared based on the "Teaching Outline for Military Courses in Regular Higher Education Institutions" issued by the Ministry of Education and the National Defense Mobilization Department of the Central Military Commission in 2019. The topics cover the core content of military theory teaching and are taught by renowned military theory experts.',
+                        hours: 18,
+                        credits: 3,
+                        image: './Courses-images/course5.jpg',
+                        teacherImage: './Courses-images/teacher5.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 8776,
+                        enrolled: 148,
+                        graduated: 22
+                    },
+                    {
+                        id: 6,
+                        title: 'Applied Mathematics',
+                        description: 'As an important foundational course in engineering vocational and technical education, "Applied Mathematics" is one of the required foundational courses for the three-year software technology program in engineering. The course content mainly includes functions, limits and continuity, derivatives and differentials, applications of derivatives, indefinite integrals, definite integrals, and their applications.',
+                        hours: 8,
+                        credits: 2,
+                        image: './Courses-images/course6.jpeg',
+                        teacherImage: './Courses-images/teacher8.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 11243,
+                        enrolled: 2315,
+                        graduated: 33
+                    },
+                    {
+                        id: 7,
+                        title: 'Applied Writing',
+                        description: 'This course is a mandatory public course, a core course in humanistic quality education. Through this course, students can understand the role of applied writing, recognize its importance in social life and work, learn the basic knowledge of applied writing, master the structure and writing requirements of commonly used application documents, and be able to write various commonly used documents in daily life and work.',
+                        hours: 99,
+                        credits: 4,
+                        image: './Courses-images/course7.jpeg',
+                        teacherImage: './Courses-images/teacher7.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 593,
+                        enrolled: 18,
+                        graduated: 1
+                    },
+                    {
+                        id: 8,
+                        title: 'Routing and Switching Device Management',
+                        description: '"Font Design" is a basic course in graphic design for art students. The course teaches the basic principles, design principles, and methods of font design, analyzes the characteristics of font styles, conducts font training, and cultivates students’ creative font design and text arrangement skills.',
+                        hours: 71,
+                        credits: 5,
+                        image: './Courses-images/course8.jpeg',
+                        teacherImage: './Courses-images/teacher3.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 2145,
+                        enrolled: 44,
+                        graduated: 0
+                    },
+                    {
+                        id: 9,
+                        title: 'Font Design',
+                        description: '"Routing and Switching Device Management" is a professional core course for cloud computing majors. It is a work-process-based course developed through school-enterprise cooperation.',
+                        hours: 120,
+                        credits: 9,
+                        image: './Courses-images/course9.jpeg',
+                        teacherImage: './Courses-images/teacher5.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 988,
+                        enrolled: 47,
+                        graduated: 15
+                    },
+                    {
+                        id: 10,
+                        title: 'Windows Server Operating System Management',
+                        description: '"Font Design" is a basic course in graphic design for art students. The course teaches the basic principles, design principles, and methods of font design, analyzes the characteristics of font styles, conducts font training, and cultivates students’ creative font design and text arrangement skills.',
+                        hours: 6,
+                        credits: 2,
+                        image: './Courses-images/course10.jpeg',
+                        teacherImage: './Courses-images/teacher8.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 34234,
+                        enrolled: 2922,
+                        graduated: 36
+                    },
+                    {
+                        id: 11,
+                        title: 'Practical Chinese',
+                        description: 'This course is a mandatory public course, a core course in humanistic quality education. It is a compulsory public course prescribed by the Ministry of Education for college students (including vocational and technical college students), and it is also a mandatory public course for three-year students of various colleges. Through this course, students can comprehensively improve their basic humanistic qualities and train their basic skills such as understanding, expression, and writing abilities.',
+                        hours: 21,
+                        credits: 4,
+                        image: './Courses-images/course11.jpeg',
+                        teacherImage: './Courses-images/teacher11.jpeg',
+                        teacherName: 'Cai Jing',
+                        views: 45643,
+                        enrolled: 321,
+                        graduated: 3
+                    },
+                    {
+                        id: 12,
+                        title: 'Military Theory',
+                        description: 'This course is prepared based on the "Teaching Outline for Military Courses in Regular Higher Education Institutions" issued by the Ministry of Education and the National Defense Mobilization Department of the Central Military Commission in 2019. The topics cover the core content of military theory teaching and are taught by renowned military theory experts.',
+                        hours: 412,
+                        credits: 4,
+                        image: './Courses-images/course12.jpeg',
+                        teacherImage: './Courses-images/teacher12.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 65643,
+                        enrolled: 7875,
+                        graduated: 12
+                    },
+                    {
+                        id: 13,
+                        title: 'Introduction to Artificial Intelligence',
+                        description: 'This course is prepared based on the "Teaching Outline for Military Courses in Regular Higher Education Institutions" issued by the Ministry of Education and the National Defense Mobilization Department of the Central Military Commission in 2019. The topics cover the core content of military theory teaching and are taught by renowned military theory experts.',
+                        hours: 82,
+                        credits: 9,
+                        image: './Courses-images/course13.jpeg',
+                        teacherImage: './Courses-images/teacher13.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 4223,
+                        enrolled: 42,
+                        graduated: 3
+                    },
+                    {
+                        id: 14,
+                        title: 'Introduction to Basic Principles of Marxism',
+                        description: 'This course is a mandatory public foundation course prescribed by the Ministry of Education in China. The content includes three components: Marxist philosophy, political economy, and scientific socialism. The course aims to educate young students on the fundamental principles and theories of Marxism, helping them establish a correct worldview and outlook on life, and strengthen their belief in socialism and communism.',
+                        hours: 34,
+                        credits: 2,
+                        image: './Courses-images/course14.jpeg',
+                        teacherImage: './Courses-images/teacher14.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 7774,
+                        enrolled: 377,
+                        graduated: 5
+                    },
+                    {
+                        id: 15,
+                        title: 'Military Theory',
+                        description: 'This course is prepared based on the "Teaching Outline for Military Courses in Regular Higher Education Institutions" issued by the Ministry of Education and the National Defense Mobilization Department of the Central Military Commission in 2019. The topics cover the core content of military theory teaching and are taught by renowned military theory experts.',
+                        hours: 54,
+                        credits: 5,
+                        image: './Courses-images/course15.jpeg',
+                        teacherImage: './Courses-images/teacher15.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 97939,
+                        enrolled: 2321,
+                        graduated: 424
+                    },
+                    {
+                        id: 16,
+                        title: 'Applied Mathematics',
+                        description: 'As an important foundational course in engineering vocational and technical education, "Applied Mathematics" is one of the required foundational courses for the three-year software technology program in engineering. The course content mainly includes functions, limits and continuity, derivatives and differentials, applications of derivatives, indefinite integrals, definite integrals, and their applications.',
+                        hours: 234245,
+                        credits: 8,
+                        image: './Courses-images/course16.jpeg',
+                        teacherImage: './Courses-images/teacher16.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 57578,
+                        enrolled: 66,
+                        graduated: 21
+                    },
+                    {
+                        id: 17,
+                        title: 'Applied Writing',
+                        description: 'This course is a mandatory public course, a core course in humanistic quality education. Through this course, students can understand the role of applied writing, recognize its importance in social life and work, learn the basic knowledge of applied writing, master the structure and writing requirements of commonly used application documents, and be able to write various commonly used documents in daily life and work.',
+                        hours: 49342,
+                        credits: 4,
+                        image: './Courses-images/course17.jpeg',
+                        teacherImage: './Courses-images/teacher17.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 21000,
+                        enrolled: 675,
+                        graduated: 98
+                    },
+                    {
+                        id: 18,
+                        title: 'Routing and Switching Device Management',
+                        description: '"Font Design" is a basic course in graphic design for art students. The course teaches the basic principles, design principles, and methods of font design, analyzes the characteristics of font styles, conducts font training, and cultivates students’ creative font design and text arrangement skills.',
+                        hours: 2,
+                        credits: 1,
+                        image: './Courses-images/course18.jpeg',
+                        teacherImage: './Courses-images/teacher18.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 876342,
+                        enrolled: 34323,
+                        graduated: 4323
+                    },
+                    {
+                        id: 19,
+                        title: 'Font Design',
+                        description: '"Routing and Switching Device Management" is a professional core course for cloud computing majors. It is a work-process-based course developed through school-enterprise cooperation.',
+                        hours: 4,
+                        credits: 6,
+                        image: './Courses-images/course19.jpeg',
+                        teacherImage: './Courses-images/teacher19.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 57018,
+                        enrolled: 4320,
+                        graduated: 20
+                    },
+                    {
+                        id: 20,
+                        title: 'Windows Server Operating System Management',
+                        description: '"Font Design" is a basic course in graphic design for art students. The course teaches the basic principles, design principles, and methods of font design, analyzes the characteristics of font styles, conducts font training, and cultivates students’ creative font design and text arrangement skills.',
+                        hours: 6894,
+                        credits: 4,
+                        image: './Courses-images/course20.jpeg',
+                        teacherImage: './Courses-images/teacher20.jpeg',
+                        teacherName: 'Mr. Li',
+                        views: 63442,
+                        enrolled: 60,
+                        graduated: 34
+                    },
+                    {
+                        id: 21,
+                        title: "Practical Chinese Language",
+                        description: "This course is a mandatory public course and a core part of humanities education. It is a compulsory course required by the Ministry of Education for college students (including vocational and technical college students) and is offered as a public required course for three-year college programs. Through this course, students can comprehensively improve their basic humanities quality, as well as their understanding, expression, and writing skills.",
+                        hours: 28,
+                        credits: 3,
+                        image: "./Courses-images/course1.jpeg",
+                        teacherImage: "./Courses-images/teacher1.jpeg",
+                        teacherName: "Cai Jing",
+                        views: 3267,
+                        enrolled: 7723,
+                        graduated: 2
+                    },
+                    {
+                        id: 22,
+                        title: "Military Theory",
+                        description: "This course is designed based on the 2019 syllabus for military courses issued by the Ministry of Education and the National Defense Mobilization Department of the Central Military Commission. It covers the core aspects of military theory, with lectures delivered by renowned experts in the field.",
+                        hours: 50,
+                        credits: 4,
+                        image: "./Courses-images/course2.jpg",
+                        teacherImage: "./Courses-images/teacher2.jpeg",
+                        teacherName: "Teacher Li",
+                        views: 1256,
+                        enrolled: 5454,
+                        graduated: 120
+                    },
+                    {
+                        id: 23,
+                        title: "Introduction to Artificial Intelligence",
+                        description: "This course is designed based on the 2019 syllabus for military courses issued by the Ministry of Education and the National Defense Mobilization Department of the Central Military Commission. It covers the core aspects of military theory, with lectures delivered by renowned experts in the field.",
+                        hours: 50,
+                        credits: 4,
+                        image: "./Courses-images/course3.jpeg",
+                        teacherImage: "./Courses-images/teacher3.jpeg",
+                        teacherName: "Teacher Li",
+                        views: 1500,
+                        enrolled: 200,
+                        graduated: 120
+                    },
+                    {
+                        id: 24,
+                        title: "Introduction to the Basic Principles of Marxism",
+                        description: "This course is a mandatory public basic course required by the Ministry of Education. Its content includes Marxist philosophy, political economy, and scientific socialism. The aim of the course is to educate young students on the basic principles and theories of Marxism, helping them establish a correct worldview and outlook on life and strengthen their belief in socialism and communism.",
+                        hours: 50,
+                        credits: 4,
+                        image: "./Courses-images/course4.jpeg",
+                        teacherImage: "./Courses-images/teacher4.jpeg",
+                        teacherName: "Teacher Li",
+                        views: 1500,
+                        enrolled: 200,
+                        graduated: 120
+                    },
+                    {
+                        id: 25,
+                        title: "Military Theory",
+                        description: "This course is designed based on the 2019 syllabus for military courses issued by the Ministry of Education and the National Defense Mobilization Department of the Central Military Commission. It covers the core aspects of military theory, with lectures delivered by renowned experts in the field.",
+                        hours: 50,
+                        credits: 4,
+                        image: "./Courses-images/course5.jpg",
+                        teacherImage: "./Courses-images/teacher5.jpeg",
+                        teacherName: "Teacher Li",
+                        views: 1500,
+                        enrolled: 200,
+                        graduated: 120
+                    },
+                    {
+                        id: 26,
+                        title: "Applied Mathematics",
+                        description: "As an important foundational course in vocational technical education for engineering majors, 'Applied Mathematics' is a compulsory basic course for the three-year software technology program. It occupies an important position in the overall professional curriculum system. The course covers topics such as functions, limits and continuity, derivatives and differentials, applications of derivatives, indefinite and definite integrals, and their applications.",
+                        hours: 50,
+                        credits: 4,
+                        image: "./Courses-images/course6.jpeg",
+                        teacherImage: "./Courses-images/teacher8.jpeg",
+                        teacherName: "Teacher Li",
+                        views: 1500,
+                        enrolled: 200,
+                        graduated: 120
+                    },
+                    {
+                        id: 27,
+                        title: "Practical Writing",
+                        description: "This course is a mandatory public course and a core part of humanities education. Through learning, students will understand the role of practical writing, recognize its importance in social life and work, learn basic knowledge about practical writing, and master the structure and requirements for writing various types of practical documents used in daily life and work.",
+                        hours: 50,
+                        credits: 4,
+                        image: "./Courses-images/course7.jpeg",
+                        teacherImage: "./Courses-images/teacher7.jpeg",
+                        teacherName: "Teacher Li",
+                        views: 1500,
+                        enrolled: 200,
+                        graduated: 120
+                    },
+                    {
+                        id: 28,
+                        title: "Routing and Switching Device Management",
+                        description: "'Font Design' is a fundamental course for graphic design in art programs. The course covers the basic principles, design rules, and methods of font design, analyzing font style characteristics, and providing font training to develop students' creative font design and text layout skills.",
+                        hours: 50,
+                        credits: 4,
+                        image: "./Courses-images/course8.jpeg",
+                        teacherImage: "./Courses-images/teacher3.jpeg",
+                        teacherName: "Teacher Li",
+                        views: 1500,
+                        enrolled: 200,
+                        graduated: 120
+                    },
+                    {
+                        id: 29,
+                        title: "Font Design",
+                        description: "'Routing and Switching Device Management' is a core course for cloud computing majors and is a collaborative course developed through school-enterprise cooperation, based on the work process.",
+                        hours: 50,
+                        credits: 4,
+                        image: "./Courses-images/course9.jpeg",
+                        teacherImage: "./Courses-images/teacher5.jpeg",
+                        teacherName: "Teacher Li",
+                        views: 1500,
+                        enrolled: 200,
+                        graduated: 120
+                    },
+                    {
+                        id: 30,
+                        title: "Windows Operating System Server Management",
+                        description: "'Font Design' is a fundamental course for graphic design in art programs. The course covers the basic principles, design rules, and methods of font design, analyzing font style characteristics, and providing font training to develop students' creative font design and text layout skills.",
+                        hours: 50,
+                        credits: 4,
+                        image: "./Courses-images/course10.jpeg",
+                        teacherImage: "./Courses-images/teacher8.jpeg",
+                        teacherName: "Teacher Li",
+                        views: 1500,
+                        enrolled: 200,
+                        graduated: 120
+                    },
+                    {
+                        "id": 31,
+                        "title": "Practical Chinese Language",
+                        "description": "This course is a mandatory public course and a core curriculum for humanities education. It is a compulsory course prescribed by the Ministry of Education for college students (including higher vocational and technical students). It is also a mandatory course for three-year students in various colleges. Through this course, students can comprehensively improve their basic humanities literacy and develop essential skills such as comprehension, expression, and writing.",
+                        "hours": 28,
+                        "credits": 3,
+                        "image": "./Courses-images/course1.jpeg",
+                        "teacherImage": "./Courses-images/teacher1.jpeg",
+                        "teacherName": "Cai Jing",
+                        "views": 3267,
+                        "enrolled": 7723,
+                        "graduated": 2
+                    },
+                    {
+                        "id": 32,
+                        "title": "Military Theory",
+                        "description": "This course is based on the 'Teaching Outline for Military Courses in General Higher Education Institutions,' issued by the Ministry of Education and the National Defense Mobilization Department of the Central Military Commission in 2019. The topics cover the core content of military theory, and the lectures are delivered by renowned experts in the field.",
+                        "hours": 50,
+                        "credits": 4,
+                        "image": "./Courses-images/course2.jpg",
+                        "teacherImage": "./Courses-images/teacher2.jpeg",
+                        "teacherName": "Teacher Li",
+                        "views": 1256,
+                        "enrolled": 5454,
+                        "graduated": 120
+                    },
+                    {
+                        "id": 33,
+                        "title": "Introduction to Artificial Intelligence",
+                        "description": "This course is based on the 'Teaching Outline for Military Courses in General Higher Education Institutions,' issued by the Ministry of Education and the National Defense Mobilization Department of the Central Military Commission in 2019. The topics cover the core content of military theory, and the lectures are delivered by renowned experts in the field.",
+                        "hours": 50,
+                        "credits": 4,
+                        "image": "./Courses-images/course3.jpeg",
+                        "teacherImage": "./Courses-images/teacher3.jpeg",
+                        "teacherName": "Teacher Li",
+                        "views": 1500,
+                        "enrolled": 200,
+                        "graduated": 120
+                    },
+                    {
+                        "id": 34,
+                        "title": "Introduction to Marxist Principles",
+                        "description": "This course is a compulsory public basic course prescribed by the Ministry of Education for higher education institutions. Its content includes Marxist philosophy, political economy, and scientific socialism. The course aims to educate young students on the basic principles and theories of Marxism, helping them establish a correct worldview and outlook on life, and strengthen their belief in socialism and communism.",
+                        "hours": 50,
+                        "credits": 4,
+                        "image": "./Courses-images/course4.jpeg",
+                        "teacherImage": "./Courses-images/teacher4.jpeg",
+                        "teacherName": "Teacher Li",
+                        "views": 1500,
+                        "enrolled": 200,
+                        "graduated": 120
+                    },
+                    {
+                        "id": 35,
+                        "title": "Military Theory",
+                        "description": "This course is based on the 'Teaching Outline for Military Courses in General Higher Education Institutions,' issued by the Ministry of Education and the National Defense Mobilization Department of the Central Military Commission in 2019. The topics cover the core content of military theory, and the lectures are delivered by renowned experts in the field.",
+                        "hours": 50,
+                        "credits": 4,
+                        "image": "./Courses-images/course5.jpg",
+                        "teacherImage": "./Courses-images/teacher5.jpeg",
+                        "teacherName": "Teacher Li",
+                        "views": 1500,
+                        "enrolled": 200,
+                        "graduated": 120
+                    },
+                    {
+                        "id": 36,
+                        "title": "Applied Mathematics",
+                        "description": "As an important foundational course in vocational and technical education for engineering, 'Applied Mathematics' is one of the compulsory foundation courses for the three-year software engineering program. The course content mainly includes functions, limits and continuity, derivatives and differentials, applications of derivatives, indefinite and definite integrals, and their applications.",
+                        "hours": 50,
+                        "credits": 4,
+                        "image": "./Courses-images/course6.jpeg",
+                        "teacherImage": "./Courses-images/teacher8.jpeg",
+                        "teacherName": "Teacher Li",
+                        "views": 1500,
+                        "enrolled": 200,
+                        "graduated": 120
+                    },
+                    {
+                        "id": 37,
+                        "title": "Applied Writing",
+                        "description": "This course is a mandatory public course and a core curriculum for humanities education. By learning this course, students can understand the role of applied writing, recognize its importance in social and work life, grasp the basic knowledge of applied writing, master the structure and writing requirements of commonly used applied documents, and write various applied documents used in daily life and work.",
+                        "hours": 50,
+                        "credits": 4,
+                        "image": "./Courses-images/course7.jpeg",
+                        "teacherImage": "./Courses-images/teacher7.jpeg",
+                        "teacherName": "Teacher Li",
+                        "views": 1500,
+                        "enrolled": 200,
+                        "graduated": 120
+                    },
+                    {
+                        "id": 38,
+                        "title": "Router and Switch Equipment Management",
+                        "description": "Font Design is a basic course in graphic design for the arts. The course teaches the basic principles, design guidelines, and methods of font design, analyzes font style characteristics, provides font training, and cultivates students' creative design abilities and text arrangement skills.",
+                        "hours": 50,
+                        "credits": 4,
+                        "image": "./Courses-images/course8.jpeg",
+                        "teacherImage": "./Courses-images/teacher3.jpeg",
+                        "teacherName": "Teacher Li",
+                        "views": 1500,
+                        "enrolled": 200,
+                        "graduated": 120
+                    },
+                    {
+                        "id": 39,
+                        "title": "Font Design",
+                        "description": "Router and Switch Equipment Management is a core course for the cloud computing specialty and is based on work process development in collaboration with industry enterprises.",
+                        "hours": 50,
+                        "credits": 4,
+                        "image": "./Courses-images/course9.jpeg",
+                        "teacherImage": "./Courses-images/teacher5.jpeg",
+                        "teacherName": "Teacher Li",
+                        "views": 1500,
+                        "enrolled": 200,
+                        "graduated": 120
+                    },
+                    {
+                        "id": 40,
+                        "title": "Windows Operating System Server Management",
+                        "description": "Font Design is a basic course in graphic design for the arts. The course teaches the basic principles, design guidelines, and methods of font design, analyzes font style characteristics, provides font training, and cultivates students' creative design abilities and text arrangement skills.",
+                        "hours": 50,
+                        "credits": 4,
+                        "image": "./Courses-images/course10.jpeg",
+                        "teacherImage": "./Courses-images/teacher8.jpeg",
+                        "teacherName": "Teacher Li",
+                        "views": 1500,
+                        "enrolled": 200,
+                        "graduated": 120
+                    }
+                ]
+            },
+            computed: {
+                totalPages() {
+                    return 4; // Explicitly set the total number of pages
+                },
+                paginatedCourses() {
+                    const start = (this.currentPage - 1) * this.coursesPerPage;
+                    const end = start + this.coursesPerPage;
+                    return this.courses.slice(start, end);
+                }
+            },
+            methods: {
+                toggleView(mode) {
+                    this.viewMode = mode;
+                },
+                goToPage(page) {
+                    this.currentPage = page;
+                },
+                goToPreviousPage() {
+                    if (this.currentPage > 1) {
+                        this.currentPage -= 1;
+                    }
+                },
+                goToNextPage() {
+                    if (this.currentPage < this.totalPages) {
+                        this.currentPage += 1;
+                    }
+                },
+                openPopup() {
+                    this.popupClass = 'visible';
+                },
+                closePopup() {
+                    this.popupClass = '';
+                },
+                searchCourses() {
+                    // Trigger recomputation of `filteredCourses`
+                }
+            }
+
+
+        });
+    </script>
+</body>
+
+</html>
