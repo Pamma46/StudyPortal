@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="pics/RainImage.png">
+  <title>Shenzhen Vocational College of Information</title>
+  <link rel="stylesheet" href="CourseDetail.css">
+</head>
+
+<body>
+  <div id="details-app">
+
+    <!-- sidebar -->
+    <div class="sidebar">
+      <div class="upper">
+        <div class="logo">
+          <a href="./portal.html"> <img src="pics/default_new_logo_pic.png" alt="logo" /></a>
+          <span class="tooltiptext">Back to portal</span>
+        </div>
+        <a href="MainVue.html" class="link-main">
+          <div class="menu">
+            <img src="pics/logo1.png" alt="Teaching Management" />
+            <p>Teach Management</p>
+          </div>
+        </a>
+      </div>
+      <div class="bottom">
+        <div class="download">
+          <img src="pics/download.png" alt="Download Icon" />
+        </div>
+        <div class="profile">
+          <img src="pics/profile.jpg" alt="Profile Picture" />
+          <div class="profile-options">
+            <ul>
+              <li>Hello, Rasheed Muhammad Asad</li>
+              <li>Reset Password</li>
+              <li>Quit</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="main-Up">
+        <header>
+          <h1>{{ course.title }}</h1>
+          <div class="para">
+            <div class="professor">
+              <img src="pics/new_defaultuser for detail.png" alt="">
+              <p>Muhammad Sadiq</p>
+            </div>
+            <div class="first">
+              <img src="pics/home-icon.png">
+              <p>2024 Fall-22 Software Technology Class 3-9 (Shenzhen Information Technology-Pakistan)</p>
+            </div>
+            <div class="second">
+              <img src="pics/calendar-icon.png" class="calendar">
+              <div class="header-wrapper">
+                <p>Course start time: -- to --</p>
+                <img src="pics/header-image.png" class="header">
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <nav class="tabs">
+          <p :class="{ active: activeTab === 'learn' }" @click="setActiveTab('learn')">What you will learn</p>
+          <p :class="{ active: activeTab === 'forum' }" @click="setActiveTab('forum')">Discussion Forum</p>
+          <p :class="{ active: activeTab === 'announcement' }" @click="setActiveTab('announcement')">Announcement</p>
+          <p :class="{ active: activeTab === 'transcript' }" @click="setActiveTab('transcript')">Transcript</p>
+        </nav>
+      </div>
+      <div class="content">
+
+        <!-- what you learn -->
+
+        <div v-if="activeTab === 'learn'" class="message">
+          <!-- <img src="pics/RainClass.png" alt="No content" /> -->
+          <p>The teacher did not publish the learning content</p>
+        </div>
+
+        <!-- discussion section -->
+
+        <div v-if="activeTab === 'forum'" class="tab-content forum-tab">
+          <div class="forum-container">
+            <div class="discussion-box">
+              <div class="search-bar">
+                <div class="search-part">
+                  <input type="text" placeholder="Please enter the search keyword" />
+                  <div class="divider"></div>
+                  <img src="pics/search blue.svg" alt="Search" />
+                </div>
+                <div class="discus" @click="startDiscussion">
+                  <img src="pics/message-2-512-1768994235.png" alt="">
+                  <p class="start-discussion-btn">Start a discus</p>
+                </div>
+              </div>
+
+              <div class="mid-part">
+                <div class="dropdown" @mouseover="showDropdown(0)" @mouseleave="hideDropdown(0)">
+                  <span :class="{ 'selected-item': dropdowns[0].defaultText === 'All posts' }">
+                    {{ dropdowns[0].defaultText }}
+                  </span>
+                  <img src="pics/arrow-down.png" class="arrow">
+                  <ul class="dropdown-content" :class="{ 'visible': dropdowns[0].isOpen }">
+                    <li v-for="(item, index) in dropdowns[0].items" :key="index"
+                      :class="{ 'active': dropdowns[0].defaultText === item }" @click="updateDropdown(item, 0)">
+                      {{ item }}
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="dropdown" @mouseover="showDropdown(1)" @mouseleave="hideDropdown(1)">
+                  <span :class="{ 'selected-item': dropdowns[1].defaultText === 'Reverse time' }">
+                    {{ dropdowns[1].defaultText }}
+                  </span>
+                  <img src="pics/arrow-down.png" class="arrow">
+                  <ul class="dropdown-content" :class="{ 'visible': dropdowns[1].isOpen }">
+                    <li v-for="(item, index) in dropdowns[1].items" :key="index"
+                      :class="{ 'active': dropdowns[1].defaultText === item }" @click="updateDropdown(item, 1)">
+                      {{ item }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="no-discussion-text">
+                <p>No discussion yet</p>
+              </div>
+            </div>
+
+            <!-- Background Section -->
+            <div class="forum-right-side">
+              <div class="notepad" v-if="isNotepadOpen">
+                <div class="input-areas">
+                  <div class="input-field">
+                    <input id="discussion-title" type="text" v-model="discussionTitle"
+                      placeholder="Enter discussion title" />
+                  </div>
+                  <div class="toolbar">
+                    <button title="Undo" @click="undoAction"><i class="fa fa-undo"></i>Undo</button>
+                    <button title="Redo" @click="redoAction"><i class="fa fa-redo"></i>Redo</button>
+                    <select id="paragraph-format" v-model="selectedFormat" @change="applyParagraphFormat">
+                      <option value="">Paragraph format</option>
+                      <option value="p">Normal</option>
+                      <option value="h1">Title 1</option>
+                      <option value="h2">Title 2</option>
+                      <option value="h3">Title 3</option>
+                      <option value="h4">Title 4</option>
+                      <option value="h5">Title 5</option>
+                      <option value="h6">Title 6</option>
+                    </select>
+                    <button title="Bold" @click="applyFormatting('bold')"><i class="fa fa-bold"></i>Bold</button>
+                    <button title="Italic" @click="applyFormatting('italic')"><i
+                        class="fa fa-italic"></i>Italic</button>
+                    <button title="Underline" @click="applyFormatting('underline')"><i
+                        class="fa fa-underline"></i>Underline</button>
+                    <button title="Strikethrough" @click="applyFormatting('strikeThrough')"><i
+                        class="fa fa-strikethrough"></i>Strikethrough</button>
+                    <button title="Unordered List" @click="applyList('unordered')"><i
+                        class="fa fa-list-ul"></i>Unordered List</button>
+                    <button title="Ordered List" @click="applyList('ordered')"><i class="fa fa-list-ol"></i>Ordered
+                      List</button>
+                    <button title="Align Left" @click="alignText('left')"><i class="fa fa-align-left"></i>Left</button>
+                    <button title="Align Center" @click="alignText('center')"><i
+                        class="fa fa-align-center"></i>Center</button>
+                    <button title="Align Right" @click="alignText('right')"><i
+                        class="fa fa-align-right"></i>Right</button>
+                    <button title="Justify" @click="alignText('justify')"><i
+                        class="fa fa-align-justify"></i>Justify</button>
+                    <button title="Insert Link" @click="insertLink"><i class="fa fa-link"></i>Link</button>
+                  </div>
+                  <div class="text-area">
+                    <textarea id="discussion-content" v-model="discussionContent"
+                      placeholder="Enter your discusion content"></textarea>
+                  </div>
+                </div>s
+                <div class="buttons">
+                  <button @click="cancelDiscussion">Cancel</button>
+                  <button @click="submitDiscussion">Release</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- announcement -->
+
+        <div v-if="activeTab === 'announcement'" class="tab-content announcement-tab">
+          <div class="announcement-container">
+            <!-- Search Bar -->
+            <div class="search-box">
+              <div class="search-bar-announce">
+                <div class="search-part-announce">
+                  <input type="text" placeholder="Please enter the search keyword" />
+                  <div class="divider"></div>
+                  <img src="pics/search blue.svg" alt="Search" />
+                </div>
+              </div>
+
+              <!-- No Announcement Message -->
+              <div class="no-announcement-text">
+                <p>No announcements yet</p>
+              </div>
+            </div>
+
+            <!-- Background Section -->
+            <div class="announcement-background">
+              <img src="pics/Announcement.png" alt="Background Image" />
+            </div>
+          </div>
+        </div>
+
+        <div v-if="activeTab === 'transcript'" class="tab-content transcript-tab">
+          <div class="transcript-container">
+            <!-- Achievement Overview -->
+            <div class="transcript-container-in">
+              <div class="achievement-overview">
+                <div class="left-side">
+                  <div class="circle-score">
+                    <div class="circle">
+                      <p class="score">0.0</p>
+                      <p class="label">Personal Score</p>
+                    </div>
+                  </div>
+                  <div class="stats">
+                    <div class="stats-detail">
+                      <p>Class average</p>
+                      <strong>0.0</strong>
+                    </div>
+                    <div class="center"></div>
+                    <div class="stats-detail">
+                      <p>Highest score in class</p>
+                      <strong>0.0</strong>
+                    </div>
+                    <div class="center"></div>
+                    <div class="stats-detail">
+                      <p>Lowest score in class </p>
+                      <strong>0.0</strong>
+                    </div>
+                  </div>
+                  <div class="video">
+                    <p>Video learning progress that counts towards assessment</p>
+                    <strong>
+                      0%
+                      <div class="tooltip-container">
+                        <div class="warning"></div>
+                        <span class="tooltip-text">
+                          This progress may affect your ability to take the exam.
+                          Please refer to the exam requirements for details.
+                        </span>
+                      </div>
+                    </strong>
+
+                  </div>
+                </div>
+                <div class="right-side">
+                  <p>No learn record</p>
+                </div>
+              </div>
+
+
+
+              <!-- Course Assessment Plan -->
+              <div class="course-assessment-plan">
+                <div class="trancript-header">
+                  <h3>Course Assessment Plan</h3>
+                  <div class="modules">
+                    <p>Total 7 modules</p>
+                    <div class="divide"></div>
+                    <p>Full score: 100 points</p>
+                  </div>
+                </div>
+                <ul>
+                  <li v-for="item in assessmentPlan" :key="item.name" class="ul-detail">
+                    <div class="ul-text"> {{ item.name }} ({{ item.units }} study units)</div>
+                    <div class="persentage"> {{ item.percentage }}% </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Study Unit Details -->
+            <div class="study-unit-details">
+              <div class="table">
+                <div class="table-head">
+                  <h4>Assessment Module</h4>
+                  <h4>Study Unit Title</h4>
+                  <h4>Chapter</h4>
+                  <h4>Study Time</h4>
+                  <h4>Completion</h4>
+                  <h4>Score</h4>
+                </div>
+                <table>
+                  <tr v-for="unit in studyUnits" :key="unit.module">
+                    <td><span class="blue-dot"></span> <span class="module-name">{{ unit.module }} </span><br> <span
+                        class="title-score"></span>{{ unit.title }}</td>
+                    <td>{{ unit.chapter }}</td>
+                    <td>{{ unit.completion }}</td>
+                    <td>{{ unit.studyTime }}</td>
+                    <td>{{ unit.score }}</td>
+                  </tr>
+                  <div class="border"></div>
+                </table>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+
+
+  </div>
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+  <script>
+    const app = Vue.createApp({
+      data() {
+        return {
+          selectedFormat: '',
+          course: {},
+          activeTab: 'learn', // Default tab
+          isNotepadOpen: false,
+          dropdowns: [
+            {
+              defaultText: 'All posts', // Default text for the first dropdown
+              items: ['All posts', 'I published', 'Teacher participation', 'Discussion Unit', 'Score posts'],
+              isOpen: false,
+            },
+            {
+              defaultText: 'Reverse time', // Default text for the second dropdown
+              items: ['Reverse time', 'Time sequence', 'Most Commented', 'Least comments'],
+              isOpen: false,
+            },
+          ],
+          assessmentPlan: [
+            { name: 'Graphics', units: 0, percentage: 10 },
+            { name: 'Video', units: 0, percentage: 20 },
+            { name: 'Discussion', units: 0, percentage: 5 },
+            { name: 'Operation', units: 0, percentage: 10 },
+            { name: 'Rain Classroom Courseware', units: 0, percentage: 5 },
+            { name: 'Classroom', units: 0, percentage: 20 },
+            { name: 'Take an Exam', units: 0, percentage: 30 },
+          ],
+          studyUnits: [
+            {
+              module: 'Graphics',
+              title: '0 units, total 10.000 points',
+              chapter: '',
+              studyTime: '',
+              completion: 'The teacher has not published any teaching activities in this module',
+              score: ''
+            },
+            {
+              module: 'Video',
+              title: '0 units, total 20.000 points',
+              chapter: '',
+              studyTime: '',
+              completion: 'The teacher has not published any teaching activities in this module',
+              score: ''
+            },
+            {
+              module: 'Discuss',
+              title: '0 units, total 5.000 points',
+              chapter: '',
+              studyTime: '',
+              completion: 'The teacher has not published any teaching activities in this module',
+              score: ''
+            },
+            {
+              module: 'Operation',
+              title: '0 units, total 10.000 points',
+              chapter: '',
+              studyTime: '',
+              completion: 'The teacher has not published any teaching activities in this module',
+              score: ''
+            },
+            {
+              module: 'Rain Classroom Courseware',
+              title: '0 units, total 5.000 points',
+              chapter: '',
+              studyTime: '',
+              completion: 'The teacher has not published any teaching activities in this module',
+              score: ''
+            },
+            {
+              module: 'Classroom',
+              title: '0 units, total 20.000 points',
+              chapter: '',
+              studyTime: '',
+              completion: 'The teacher has not published any teaching activities in this module',
+              score: ''
+            },
+          ],
+          discussionTitle: '',
+          discussionContent: '',
+        };
+      },
+
+
+
+      methods: {
+        setActiveTab(tab) {
+          this.activeTab = tab;
+        },
+        updateDropdown(selectedText, dropdownIndex) {
+          this.dropdowns[dropdownIndex].defaultText = selectedText;
+          this.hideDropdown(dropdownIndex);
+        },
+        showDropdown(index) {
+          this.dropdowns[index].isOpen = true;
+        },
+        hideDropdown(index) {
+          this.dropdowns[index].isOpen = false;
+        },
+        startDiscussion() {
+          this.isNotepadOpen = true;
+          document.querySelector('.notepad').classList.add('open');
+        },
+        cancelDiscussion() {
+          this.isNotepadOpen = false;
+          document.querySelector('.notepad').classList.remove('open');
+          this.discussionTitle = '';
+          this.discussionContent = '';
+        },
+        submitDiscussion() {
+          if (this.discussionTitle && this.discussionContent) {
+            alert(`Discussion Posted!\nTitle: ${this.discussionTitle}\nContent: ${this.discussionContent}`);
+            this.cancelDiscussion();
+          } else {
+            alert('Please fill out all fields before releasing the discussion.');
+          }
+        },
+        applyFormatting(command) {
+          document.execCommand(command, false, null);
+          this.focusEditor();
+        },
+        undoAction() {
+          document.execCommand('undo', false, null);
+          this.focusEditor();
+        },
+        redoAction() {
+          document.execCommand('redo', false, null);
+          this.focusEditor();
+        },
+        applyParagraphFormat() {
+          if (this.selectedFormat) {
+            document.execCommand('formatBlock', false, this.selectedFormat);
+            this.selectedFormat = ''; // Reset selection after applying
+            this.focusEditor();
+          }
+        },
+        applyList(type) {
+          const command = type === 'unordered' ? 'insertUnorderedList' : 'insertOrderedList';
+          document.execCommand(command, false, null);
+          this.focusEditor();
+        },
+        alignText(alignment) {
+          const command = `justify${alignment.charAt(0).toUpperCase()}${alignment.slice(1)}`;
+          document.execCommand(command, false, null);
+          this.focusEditor();
+        },
+        insertLink() {
+          const url = prompt('Enter the URL:', 'https://');
+          if (url) {
+            document.execCommand('createLink', false, url);
+            this.focusEditor();
+          }
+        },
+        focusEditor() {
+          this.$refs.editor.focus();
+        }
+      },
+      mounted() {
+        this.$refs.editor.addEventListener('click', this.focusEditor);
+        const params = new URLSearchParams(window.location.search);
+        this.course = {
+          title: params.get('title'),
+          details: params.get('details'),
+        };
+      },
+    });
+    app.mount("#details-app");
+  </script>
+</body>
+
+</html>
